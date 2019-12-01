@@ -1,0 +1,61 @@
+#西蒙斯模型1
+a=20 #20张卡片
+b=10000 #进行10000次实验
+n=rep(a,b)
+s1=rep(a,b)
+s2=rep(a,b)
+s3=rep(a,b)
+q_all=rep(a,b)
+for(i in 1:b)
+{
+p1=runif(n[i])
+p=0.75 #问题A比例
+q1=0.2 #问题A回答是比例
+q2=0.3 #问题B回答是比例
+s1[i]=sum(p1<p) #回答问题A的人数
+p2=runif(s1[i]) 
+p3=runif(n[i]-s1[i])
+s2[i]=sum(p2<q1) #问题A答是的人数
+s3[i]=sum(p3>q2) #问题B答否的人数
+q_all[i]=((s2[i]+s3[i])/n[i]-q2*(1-p))/p
+}
+q_all
+mean(q_all)
+var(q_all)
+hist(q_all)
+
+#西蒙斯模型2
+a=20 #20张卡片
+b=10000 #进行10000次实验
+n=rep(a,b)
+s1=rep(a,b)
+s2=rep(a,b)
+s3=rep(a,b)
+s4=rep(a,b)
+s5=rep(a,b)
+s6=rep(a,b)
+q_all=rep(a,b)
+for(i in 1:b)
+{
+x1=runif(n[i])
+x2=runif(n[i])
+p1=0.75 #问题A比例(15张A，5张B）设为事件a
+p2=0.5 #问题A比例(10张A，10张B)设为事件b
+q1=0.2 #问题A回答是比例
+q2=0.3 #问题B回答是比例
+s1[i]=sum(x1<p1) #事件a回答问题A的人数
+s2[i]=sum(x2<p2) #事件b回答问题A的人数
+p3=runif(s1[i]) 
+p4=runif(n[i]-s1[i])
+p5=runif(s2[i]) 
+p6=runif(n[i]-s2[i])
+s3[i]=sum(p3<q1) #事件a问题A答是的人数
+s4[i]=sum(p4>q2) #事件a问题B答否的人数
+s5[i]=sum(p5<q1) #事件b问题A答是的人数
+s6[i]=sum(p6>q2) #事件b问题B答否的人数
+q_all[i]=(((s3[i]+s4[i])/n)*(1-p2)-((s5[i]+s6[i])/n)*(1-p1))/(p1-p2)
+}
+q_all
+mean(q_all)
+var(q_all)
+hist(q_all)
