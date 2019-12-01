@@ -1,0 +1,30 @@
+##数据预处理
+data=read.table(file=choose.files(""))  #输入数据
+data=as.numeric(data)
+data=rev(data)
+tdata=ts(data=data,start=1949)
+##建立arima模型
+library(TSA)
+library(urca)
+plot(tdata,type='o')  #序列图
+acf(tdata)  #自相关图
+urtest=ur.df(tdata,type='trend')  #单位根检验
+summary(urtest)
+ddata=diff(tdata,lag=1,differences=1)  #一阶差分
+plot(ddata)
+urtest1=ur.df(ddata,type='trend')  #单位根检验
+summary(urtest1)
+acf(ddata)  #模型识别确定p和q
+pacf(ddata)
+eacf(ddata)
+m1=arima(tdata,order=c(1,1,0),method='ML')  #拟合arima(1,1,0)模型
+m2=arima(tdata,order=c(0,1,1),method='ML')  #拟合arima(0,1,1)模型
+acf(m1$resid)  #模型诊断
+acf(m2$resid)  #模型诊断
+##预测
+predict(m1,n.ahead=5)
+plot(m1,n.ahead=5)
+##非季节性时间序列的确定性趋势模型
+T=time(tdata)  #提取时间序列数据的时间参数指标
+model=lm(tdata~T)
+abline(model)
