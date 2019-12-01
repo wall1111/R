@@ -1,0 +1,7 @@
+q1=read.table(file=choose.files("")) #读取数据
+attach(q1) 
+c1=c(V1,V2,V3,V4,V5,V6) #整理数据
+t1=ts(c1,start=1975,freq=12) #创建时间序列数据
+plot(t1) #绘制时序图
+acf(t1,plot=F) #计算自相关系数
+acf(t1) #绘制自相关图
