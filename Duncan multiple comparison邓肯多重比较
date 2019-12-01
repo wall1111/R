@@ -1,0 +1,27 @@
+##数据预处理
+x=c(74,64,60,79,68,73,82,88,92,99,104,96,
+    92,86,88,98,104,88,99,108,95,104,110,99,
+    99,98,102,104,99,95,108,110,99,114,111,107)  #输入数据
+data1=data.frame(x,A=gl(3,12,36),B=gl(4,3,36))  #因子产生
+##正态性检验
+#对进刀速度因子的正态性检验
+shapiro.test(x[data1$A==1])
+shapiro.test(x[data1$A==2])
+shapiro.test(x[data1$A==3])
+#对切割深度因子的正态性检验
+shapiro.test(x[data1$B==1])
+shapiro.test(x[data1$B==2])
+shapiro.test(x[data1$B==3])
+shapiro.test(x[data1$B==4])
+##方差齐性检验
+bartlett.test(x~A,data=data1)
+bartlett.test(x~B,data=data1)
+##方差分析
+data1.aov=aov(x~A+B+A*B,data=data1)  #交互效应模型
+summary(data1.aov)
+##邓肯多重比较
+library(agricolae)
+out1=duncan.test(data1.aov,"A",alpha=0.05)
+plot(out1,main="Level A")
+out2=duncan.test(data1.aov,"B",alpha=0.05)
+plot(out2,main="Level B")
