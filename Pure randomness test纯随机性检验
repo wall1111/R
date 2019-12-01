@@ -1,0 +1,8 @@
+q2=read.table(file=choose.files("")) #读取数据
+attach(q2)
+c2=c(V1,V2,V3,V4,V5,V6,V7,V8,V9,V10,V11,V12) #整理数据
+t2=ts(c2,start=1,freq=1) #创建时间序列数据
+acf(t2,lag=20,plot=F) #计算自相关系数
+Box.test(t2,lag=5,type=c("Ljung-Box")) #纯随机性检验 
+Box.test(t2,lag=10,type=c("Ljung-Box")) #纯随机性检验 
+Box.test(t2,lag=15,type=c("Ljung-Box")) #纯随机性检验 
