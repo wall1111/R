@@ -1,0 +1,22 @@
+data(electricity)
+plot(electricity) #画时序图
+##差分除去趋势，确定d的阶数
+data=diff(electricity) #1阶差分
+plot(data)
+acf(data,lag.max=96) #自相关检验
+##消除季节波动 确定D的阶数
+data1=diff(diff(electricity),lag=12)  #12步差分
+plot(data1)
+par(mfrow=c(2,1))
+acf(as.vector(data1),lag.max=36)
+pacf(as.vector(data1),lag.max=36)
+m1=ur.df(data1,type='none') #单位根检验
+summary(m1)
+##乘积模型
+m2=arima(electricity,order=c(2,1,0),seasonal=list(order=c(0,1,1),period=12))
+m3=arima(electricity,order=c(0,1,2),seasonal=list(order=c(0,1,1),period=12))
+###模型诊断
+plot(m3$resid)
+acf(as.vector(m3$resid))
+qqnorm(m3$resid)
+qqline(m3$resid)
