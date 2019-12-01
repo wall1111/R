@@ -1,0 +1,21 @@
+data=scan(file=choose.files(""))  #输入数据
+tdata=ts(data,start=c(1971,3),freq=4)  #转换为时间序列数据
+acf(tdata,lag=20)  #平稳性判别
+B=NULL;for( i in 1:20)
+B=c(B,Box.test(tdata, lag = i, type = "Ljung-Box")$p.value)
+plot(B,main="Ljung-Box tests",ylab="p-value",xlab="lag")
+abline(h=.05,lty=2)  #纯随机性检验
+acf(tdata)
+pacf(tdata)
+eacf(tdata)  #判定模型类型
+ar7=arima(tdata,order=c(7,0,0),method='CSS-ML')  #AR模型参数估计
+ma9=arima(tdata,order=c(0,0,9),method='CSS-ML')  #MA模型参数估计
+arma1_2=arima(tdata,order=c(1,0,2),method='CSS-ML')  #ARMA模型参数估计
+res_ar=ar7$resid  #残差
+res_ma=ma9$resid
+res_arma=arma1_2$resid
+Box.test(res_ar,lag=1,type=c("Ljung-Box"))  #残差白噪声检验
+Box.test(res_ma,lag=1,type=c("Ljung-Box")) 
+Box.test(res_arma,lag=1,type=c("Ljung-Box")) 
+predict(arma1_2,n.ahead=20)
+plot(arma1_2,n.ahead=20,type='b')  #预测后20个季度的数据
