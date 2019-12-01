@@ -1,0 +1,32 @@
+sta=read.table(file=choose.files()) #读取文件
+fix(sta) #类型改为numeric
+y=sta[,9] #提取期末专业人员数据
+y[is.na(y)]=0 #缺失值处理
+ymean=mean(y) #求总体期望
+yvar=var(y) #求总体方差
+mu=1.96 
+N=length(y) #总量
+n0=mu^2*yvar/(0.1*ymean)^2 #计算样本量
+n=n0/(1+n0/N) #修正样本量
+n=2874 #确定样本量为2874
+f=n/N #抽样比
+y_mean=rep(0,1000) #预定义均值、总体总量、均值方差、总量方差
+y_tot=rep(0,1000)
+mean_var=rep(0,1000)
+tot_var=rep(0,1000)
+for(i in 1:1000) #循环抽取1000个样本
+{ 
+  y_sample=sample(y,n)
+  y_mean[i]=mean(y_sample) #计算样本均值来估计总体均值
+  y_tot[i]=y_mean[i]*N #估计总体总量
+  mean_var[i]=(1-f)*var(y_sample)/n #计算均值方差
+  tot_var[i]=N*(N-n)*var(y_sample)/n #计算总量方差
+}
+mean(y_mean) #1000个样本所得估计均值的均值
+mean(y_tot) #1000个样本所得估计总体总量的均值
+mean(mean_var) #1000个样本所得均值方差的均值
+mean(tot_var) #1000个样本所得总量方差的均值
+hist(y_mean) #绘制总体均值直方图
+hist(y_tot) #绘制总体总量直方图
+hist(mean_var) #绘制均值方差直方图
+hist(tot_var) #绘制总量方差直方图
