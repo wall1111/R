@@ -1,0 +1,22 @@
+#沃纳随机化回答模型
+fun1=function(n,m,p,q)
+{
+	a=rep(n,m)
+	b=rep(0,m)
+	for(i in 1:m)
+	{
+		x=runif(a[i]) #向20人分发卡片
+		rx=(x<p) #20人中抽中问题A的为真
+		y1=runif(sum(rx)) 
+		ry1=(y1<q) #计算问题A答是的人数
+		y2=runif(n-sum(rx)) 
+		ry2=(y2>q) #计算问题B答否的人数
+		b[i]<-((sum(ry1)+sum(ry2))/n-(1-p))/(2*p-1) #计算作弊的概率
+	}
+	return(b)
+
+}
+res=fun1(20,1000,0.7,0.6)#进行1000次20人实验（假设答是的人概率为0.6）
+mean(res)
+var(res)
+hist(res)
