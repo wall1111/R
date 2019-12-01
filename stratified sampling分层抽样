@@ -1,0 +1,71 @@
+sta=read.table(file=choose.files()) #读取文件
+fix(sta) #V9类型改为numeric
+sta$V9[is.na(sta$V9)]=0 #缺失值处理
+x=substring(sta[,1],1,1) #提取行业代码第一位
+x[1]=4 #缺失值处理
+x=as.numeric(x) 
+N=length(x) #总单元数
+#预定义第h层单元数，第h层层权，第h层标准差,以及Neyman分配所需参数
+Nh=rep(0,9) 
+Wh=rep(0,9)
+Sh=rep(0,9)
+NhSh=rep(0,9)
+WhSh=rep(0,9)
+WhSh2=rep(0,9)
+#分层
+for(i in 1:9)
+{
+  Nh[i]=length(which(x==i)) #第h层单元数
+  Wh[i]=Nh[i]/N #第h层层权Wh
+  Sh[i]=sqrt(var(sta[which(x==i),]$V9)) #第h层标准差
+  NhSh[i]=Nh[i]*Sh[i]
+  WhSh[i]=Wh[i]*Sh[i]
+  WhSh2[i]=Wh[i]*Sh[i]^2
+}
+#计算总样本量
+Y_mean=mean(sta$V9)
+sum_NhSh=sum(NhSh)
+sum_WhSh=sum(WhSh)
+sum_WhSh2=sum(WhSh2)
+V=(0.1*Y_mean)^2/1.96^2
+n=sum_WhSh^2/(V+1/N*sum_WhSh2) #
+n=2076
+#计算层样本量
+wh=NhSh/sum_NhSh
+nh=round(wh*n)
+#计算估计量
+yst_mean=rep(0.1000) #预定义
+y_tot=rep(0.1000)
+mean_var=rep(0.1000)
+tot_var=rep(0.1000)
+for(i in 1:1000)
+{
+  yh_mean=rep(0,9)
+  yh_var=rep(0,9)
+  Whyh_mean=rep(0,9)
+  Wh2sh2_nh=rep(0,9)
+  Whsh2_N=rep(0,9)
+  NhNhnhsh2nh=rep(0,9)
+  for(j in 1:9)
+  {
+    sam=sample(sta[which(x==j),]$V9,nh[j]) #取层样本
+    yh_mean[j]=mean(sam) #计算层均值
+    yh_var[j]=var(sam) #计算层方差
+    Whyh_mean[j]=Wh[j]*yh_mean[j] #计算估计量参数
+    Wh2sh2_nh[j]=Wh[j]^2*yh_var[j]/nh[j]
+    Whsh2_N[j]=Wh[j]*yh_var[j]/N
+    NhNhnhsh2nh[j]=Nh[j]*(Nh[j]-nh[j])*yh_var[j]/nh[j]
+  }
+  yst_mean[i]=sum(Whyh_mean) #计算
+  y_tot[i]=N*yst_mean[i]
+  mean_var[i]=sum(Wh2sh2_nh)-sum(Whsh2_N)
+  tot_var[i]=sum(NhNhnhsh2nh)
+}
+mean(yst_mean) #1000个样本所得估计均值的均值
+mean(y_tot) #1000个样本所得估计总体总量的均值
+mean(mean_var) #1000个样本所得均值方差的均值
+mean(tot_var) #1000个样本所得总量方差的均值
+hist(yst_mean) #绘制总体均值直方图
+hist(y_tot) #绘制总体总量直方图
+hist(mean_var) #绘制均值方差直方图
+hist(tot_var) #绘制总量方差直方图
