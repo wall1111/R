@@ -1,0 +1,38 @@
+sta=read.table(file=choose.files()) #读取文件
+fix(sta) #V9类型改为numeric
+sta$V9[is.na(sta$V9)]=0 #缺失值处理
+sta=sta[,c(4,9)]
+n=2874 #由实验1可得样本量
+attach(sta)
+y=V9
+x=V4
+N=length(y) #总体总量
+f=n/N #抽样比
+#比估计
+sy2=var(y) #求y的方差
+sx2=var(x) #求x的方差
+syx=cov(x,y) #求x,y之间的协方差
+y_mean=rep(0,1000) #预定义
+x_mean=rep(0,1000)
+R_hat=rep(0,1000)
+for(i in 1:1000)
+{
+  sam=sample(1:N,n)
+  sta1=sta[sam,]
+  y_mean[i]=mean(sta1$V9) #y均值
+  x_mean[i]=mean(sta1$V4) #x均值
+  R_hat[i]=y_mean[i]/x_mean[i] #R估计量
+} 
+X=sum(sta$V4)
+Y_hat=R_hat*X #Y估计量
+yr_var=(1-f)/n*(sy2+R_hat^2*sx2-2*R_hat*syx) #y均值的方差
+Yhat_var=N^2*(1-f)/n*(sy2+R_hat^2*sx2-2*R_hat*syx) #Y的方差
+mean(y_mean) #1000个样本所得估计均值的均值
+mean(Y_hat) #1000个样本所得估计总体总量的均值
+mean(yr_var) #1000个样本所得均值方差的均值
+mean(Yhat_var) #1000个样本所得总量方差的均值
+hist(y_mean) #绘制总体均值直方图
+hist(Y_hat) #绘制总体总量直方图
+hist(yr_var) #绘制均值方差直方图
+hist(Yhat_var) #绘制总量方差直方图
+#回归估计
